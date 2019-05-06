@@ -3,7 +3,7 @@ env.DOCKERHUB_PROJECT_NAME = "calculator"
 env.DOCKERHUB_PROJECT_PATH = DOCKERHUB_USERNAME + "/" + DOCKERHUB_PROJECT_NAME
 node("stage")
 {
-    //checkout scm
+    checkout scm
     stage("Unit-testing")
     {
         sh "docker run --rm -d --name test -p 3000:3000 ${DOCKERHUB_PROJECT_PATH}"
