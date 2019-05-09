@@ -4,7 +4,7 @@ environment
         DOCKERHUB_PROJECT_NAME = "calculator"
         DOCKERHUB_PROJECT_PATH = DOCKERHUB_USERNAME + "/" + DOCKERHUB_PROJECT_NAME
     }
-node("stage")
+node("ubuntu-slave-1")
 {
     stages
     {
