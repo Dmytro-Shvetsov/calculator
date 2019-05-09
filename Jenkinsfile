@@ -1,40 +1,32 @@
-pipeline
-{
-    
-    node("stage")
+environment
     {
-        agent
+        DOCKERHUB_USERNAME = "dymokk"
+        DOCKERHUB_PROJECT_NAME = "calculator"
+        DOCKERHUB_PROJECT_PATH = DOCKERHUB_USERNAME + "/" + DOCKERHUB_PROJECT_NAME
+    }
+node("stage")
+{
+    stages
+    {
+        stage("Cloning git")
         {
-            label "ubuntu-slave-1"
+            git credentialsId: '6a470481-5272-42b2-98ae-5ede2528bc13', url: 'https://github.com/Dmytro-Shvetsov/calculator'
         }
-        environment
+        stage("Unit-testing")
         {
-            DOCKERHUB_USERNAME = "dymokk"
-            DOCKERHUB_PROJECT_NAME = "calculator"
-            DOCKERHUB_PROJECT_PATH = DOCKERHUB_USERNAME + "/" + DOCKERHUB_PROJECT_NAME
+            sh "docker run --rm -d --name test -p 3000:3000 ${DOCKERHUB_PROJECT_PATH}"
+
+            sh "docker exec -it ${DOCKERHUB_PROJECT_PATH} npm test"
+            sh "docker ps -aq | xargs docker rm || true"
         }
-        stages
+        stage("Build")
         {
-            stage("Cloning git")
-            {
-                git credentialsId: '6a470481-5272-42b2-98ae-5ede2528bc13', url: 'https://github.com/Dmytro-Shvetsov/calculator'
-            }
-            stage("Unit-testing")
-            {
-                sh "docker run --rm -d --name test -p 3000:3000 ${DOCKERHUB_PROJECT_PATH}"
-            
-                sh "docker exec -it ${DOCKERHUB_PROJECT_PATH} npm test"
-                sh "docker ps -aq | xargs docker rm || true"
-            }
-            stage("Build")
-            {
-                sh "docker build -t ${DOCKERHUB_PROJECT_PATH}:${BUILD_NUMBER}"
-            }
-            stage("Publish")
-            {
-                withRegistry([credentialsId: "DockerHub"])
-                sh "docker push ${DOCKERHUB_PROJECT_PATH}:${BUILD_NUMBER}"
-            }
+            sh "docker build -t ${DOCKERHUB_PROJECT_PATH}:${BUILD_NUMBER}"
+        }
+        stage("Publish")
+        {
+            withRegistry([credentialsId: "DockerHub"])
+            sh "docker push ${DOCKERHUB_PROJECT_PATH}:${BUILD_NUMBER}"
         }
     }
 }
