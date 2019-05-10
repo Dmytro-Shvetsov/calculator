@@ -12,7 +12,7 @@ node("ubuntu-slave-1")
     }
     stage("Build")
     {
-        sh "docker build -t calc-demo:${BUILD_NUMBER} ${WORKSPACE}/calculator"
+        sh "docker build -t calc-demo:${BUILD_NUMBER} ${WORKSPACE}"
     }
     stage("Unit-testing")
     {
