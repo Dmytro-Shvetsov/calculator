@@ -20,8 +20,14 @@ node("ubuntu-slave-1")
         stage("Unit-testing")
         {
             sh "echo ${PASSWORD} | sudo -S docker run --rm -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
-            sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
-            sh "echo ${PASSWORD} | sudo -S docker ps -aq | xargs docker rm || true"
+            try 
+            {
+                  sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
+            } 
+            finally
+            {
+                sh "echo ${PASSWORD} | sudo -S docker ps -aq | xargs docker rm || true"
+            }
         }
         stage("Publish")
         {
