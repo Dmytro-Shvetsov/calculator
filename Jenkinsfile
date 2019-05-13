@@ -26,7 +26,7 @@ node("ubuntu-slave-1")
             } 
             finally
             {
-                sh "echo ${PASSWORD} | sudo -S docker ps -aq | xargs docker rm || true"
+                sh "echo ${PASSWORD} | sudo -S docker ps -aq | xargs sudo docker rm -f || true"
             }
         }
         stage("Publish")
