@@ -11,7 +11,7 @@ node("ubuntu-slave-1")
         git credentialsId: '6a470481-5272-42b2-98ae-5ede2528bc13', url: 'https://github.com/Dmytro-Shvetsov/calculator'
     }
     
-    withCredentials([usernamePassword(credentialsId: '1fdea051-9c8f-4ade-9bcf-b83183c78640', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
+    withCredentials([usernamePassword(credentialsId: '05b94153-82a9-44bd-98d3-c35132260797', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
     {
         stage("Build")
         {
