@@ -10,24 +10,25 @@ node("ubuntu-slave-1")
     {
         git credentialsId: '6a470481-5272-42b2-98ae-5ede2528bc13', url: 'https://github.com/Dmytro-Shvetsov/calculator'
     }
-    withCredentials([string(credentialsId: "1fdea051-9c8f-4ade-9bcf-b83183c78640", variable: "USER_PASSWD")])
+    
+    withCredentials([usernamePassword(credentialsId: '1fdea051-9c8f-4ade-9bcf-b83183c78640', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
     {
         stage("Build")
         {
-            sh "docker build -t calc-demo:${BUILD_NUMBER} ${WORKSPACE}"
+            sh "echo ${PASSWORD} | sudo -S docker build -t calc-demo:${BUILD_NUMBER} ${WORKSPACE}"
         }
         stage("Unit-testing")
         {
-            sh "echo ${USER_PASSWD} | sudo -S docker run --rm -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
-            sh "echo ${USER_PASSWD} | sudo -S docker exec -it test npm test"
-            sh "echo ${USER_PASSWD} | sudo -S docker ps -aq | xargs docker rm || true"
+            sh "echo ${PASSWORD} | sudo -S docker run --rm -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
+            sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
+            sh "echo ${PASSWORD} | sudo -S docker ps -aq | xargs docker rm || true"
         }
         stage("Publish")
         {
-            sh "echo ${USER_PASSWD} | sudo -S docker commit calc-demo:${BUILD_NUMBER} ${DOCKERHUB_IMAGE}"
+            sh "echo ${PASSWORD} | sudo -S docker commit calc-demo:${BUILD_NUMBER} ${DOCKERHUB_IMAGE}"
             withRegistry([credentialsId: "DockerHub"])
             {
-                sh "echo ${USER_PASSWD} | sudo -S docker push ${DOCKERHUB_IMAGE}:latest"
+                sh "echo ${PASSWORD} | sudo -S docker push ${DOCKERHUB_IMAGE}:latest"
             }
         }
     }
