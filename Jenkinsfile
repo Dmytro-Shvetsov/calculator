@@ -12,7 +12,7 @@ node("ubuntu-slave-1")
     }
     stage("Cloning docker image")
     {
-        withRegistry([credentialsId: "DockerHub"])
+        withDockerRegistry([credentialsId: "DockerHub"])
             {
                 sh "docker pull ${DOCKER_IMAGE}"
             }
@@ -38,7 +38,7 @@ node("ubuntu-slave-1")
         stage("Publish")
         {
             sh "echo ${PASSWORD} | sudo -S docker commit calc-demo:${BUILD_NUMBER} ${DOCKERHUB_IMAGE}"
-            withRegistry([credentialsId: "DockerHub"])
+            withDockerRegistry([credentialsId: "DockerHub"])
             {
                 sh "echo ${PASSWORD} | sudo -S docker push ${DOCKERHUB_IMAGE}:latest"
             }
