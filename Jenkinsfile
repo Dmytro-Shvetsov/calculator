@@ -15,7 +15,7 @@ node("ubuntu-slave-1")
     {
         stage("Cloning docker image")
         {
-            withDockerRegistry([credentialsId: "DockerHub"])
+            withDockerRegistry(credentialsId: 'DockerHub', url: 'https://cloud.docker.com/u/dymokk/repository/docker/dymokk/calculator')
             {
                 sh "echo ${PASSWORD} | sudo -S docker pull ${DOCKER_IMAGE}"
             }
