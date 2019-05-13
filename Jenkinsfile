@@ -27,10 +27,6 @@ node("ubuntu-slave-1")
             {
                 sh "Unit tests have not passed. ${error}"
             }
-            finally
-            {
-                sh "echo ${PASSWORD} | sudo -S docker stop test && sudo docker rm test || true"
-            }
         }
         stage("Publish")
         {
