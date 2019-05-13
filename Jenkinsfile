@@ -23,10 +23,13 @@ node("ubuntu-slave-1")
             try 
             {
                   sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
-            } 
+            }catch(error)
+            {
+                sh "Unit tests have not passed. ${error}"
+            }
             finally
             {
-                sh "echo ${PASSWORD} | sudo -S docker ps -aq | xargs sudo docker rm -f || true"
+                sh "echo ${PASSWORD} | sudo -S docker stop test && sudo docker rm test || true"
             }
         }
         stage("Publish")
