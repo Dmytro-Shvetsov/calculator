@@ -31,7 +31,7 @@ node("ubuntu-slave-1")
         }
         stage("Publish")
         {
-            sh "echo ${PASSWORD} | sudo -S docker commit calc-demo:${BUILD_NUMBER} ${env.DOCKERHUB_IMAGE}"
+            sh "echo ${PASSWORD} | sudo -S docker commit test ${env.DOCKERHUB_IMAGE}"
             withDockerRegistry([credentialsId: "DockerHub"])
             {
                 sh "echo ${PASSWORD} | sudo -S docker push ${env.DOCKERHUB_IMAGE}:latest"
