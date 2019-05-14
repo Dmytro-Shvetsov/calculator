@@ -27,6 +27,7 @@ node("ubuntu-slave-1")
             {
                 sh "Unit tests have not passed. ${error}"
             }
+            sh "echo ${PASSWORD} | sudo -S docker stop calc-demo:${BUILD_NUMBER}"
         }
         stage("Publish")
         {
