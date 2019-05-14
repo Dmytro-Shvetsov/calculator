@@ -1,39 +1,36 @@
-pipeline
+node("ubuntu-slave-1")
 {
-    
-    node("stage")
+    stage("Cloning git")
     {
-        agent
+        git credentialsId: '27dba3c9-93b1-4619-8c7f-dc10969057ca', url: 'https://github.com/Dmytro-Shvetsov/calculator'
+    }
+    
+    withCredentials([usernamePassword(credentialsId: 'f2901bd9-cb29-4417-9980-df75e729021d', usernameVariable: 'SLAVE_USER', passwordVariable: 'SLAVE_PASSWORD')])
+    {
+        stage("Build")
         {
-            label "ubuntu-slave-1"
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker build -t calc-demo:${BUILD_NUMBER} ${WORKSPACE}"
         }
-        environment
+        stage("Unit-testing")
         {
-            DOCKERHUB_USERNAME = "dymokk"
-            DOCKERHUB_PROJECT_NAME = "calculator"
-            DOCKERHUB_PROJECT_PATH = DOCKERHUB_USERNAME + "/" + DOCKERHUB_PROJECT_NAME
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker run -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
+            try 
+            {
+                sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
+            }catch(error)
+            {
+                sh "Unit tests have not passed. ${error}"
+            }
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker stop test"
         }
-        stages
+        stage("Publish")
         {
-            stage("Cloning git")
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker commit test ${env.DOCKERHUB_IMAGE}"
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker rm test"
+            withCredentials([usernamePassword(credentialsId: 'DockerHub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')])
             {
-                git credentialsId: '6a470481-5272-42b2-98ae-5ede2528bc13', url: 'https://github.com/Dmytro-Shvetsov/calculator'
-            }
-            stage("Unit-testing")
-            {
-                sh "docker run --rm -d --name test -p 3000:3000 ${DOCKERHUB_PROJECT_PATH}"
-            
-                sh "docker exec -it ${DOCKERHUB_PROJECT_PATH} npm test"
-                sh "docker ps -aq | xargs docker rm || true"
-            }
-            stage("Build")
-            {
-                sh "docker build -t ${DOCKERHUB_PROJECT_PATH}:${BUILD_NUMBER}"
-            }
-            stage("Publish")
-            {
-                withRegistry([credentialsId: "DockerHub"])
-                sh "docker push ${DOCKERHUB_PROJECT_PATH}:${BUILD_NUMBER}"
+                sh "echo ${SLAVE_PASSWORD} | sudo -S docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWD}"
+                sh "echo ${SLAVE_PASSWORD} | sudo -S docker push 'dymokk/calculator':latest"
             }
         }
     }
