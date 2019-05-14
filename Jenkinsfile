@@ -11,15 +11,15 @@ node("ubuntu-slave-1")
         git credentialsId: '27dba3c9-93b1-4619-8c7f-dc10969057ca', url: 'https://github.com/Dmytro-Shvetsov/calculator'
     }
     
-    withCredentials([usernamePassword(credentialsId: 'f2901bd9-cb29-4417-9980-df75e729021d', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
+    withCredentials([usernamePassword(credentialsId: 'f2901bd9-cb29-4417-9980-df75e729021d', usernameVariable: 'SLAVE_USER', passwordVariable: 'SLAVE_PASSWORD')])
     {
         stage("Build")
         {
-            sh "echo ${PASSWORD} | sudo -S docker build -t calc-demo:${BUILD_NUMBER} ${WORKSPACE}"
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker build -t calc-demo:${BUILD_NUMBER} ${WORKSPACE}"
         }
         stage("Unit-testing")
         {
-            sh "echo ${PASSWORD} | sudo -S docker run -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker run -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
             try 
             {
                 //sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
@@ -27,15 +27,16 @@ node("ubuntu-slave-1")
             {
                 sh "Unit tests have not passed. ${error}"
             }
-            sh "echo ${PASSWORD} | sudo -S docker stop test"
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker stop test"
         }
         stage("Publish")
         {
-            sh "echo ${PASSWORD} | sudo -S docker commit test ${env.DOCKERHUB_IMAGE}"
-            sh "echo ${PASSWORD} | sudo -S docker rm test"
-            withDockerRegistry([credentialsId: "DockerHub"])
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker commit test ${env.DOCKERHUB_IMAGE}"
+            sh "echo ${SLAVE_PASSWORD} | sudo -S docker rm test"
+            withCredentials([usernamePassword(credentialsId: 'f2901bd9-cb29-4417-9980-df75e729021d', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')])
             {
-                sh "echo ${PASSWORD} | sudo -S docker push ${env.DOCKERHUB_IMAGE}:latest"
+                sh "echo ${SLAVE_PASSWORD} | sudo -S docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWD}"
+                sh "echo ${SLAVE_PASSWORD} | sudo -S docker push ${env.DOCKERHUB_IMAGE}:latest"
             }
         }
     }
