@@ -33,7 +33,7 @@ node("ubuntu-slave-1")
         {
             sh "echo ${SLAVE_PASSWORD} | sudo -S docker commit test ${env.DOCKERHUB_IMAGE}"
             sh "echo ${SLAVE_PASSWORD} | sudo -S docker rm test"
-            withCredentials([usernamePassword(credentialsId: 'f2901bd9-cb29-4417-9980-df75e729021d', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')])
+            withCredentials([usernamePassword(credentialsId: 'DockerHub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')])
             {
                 sh "echo ${SLAVE_PASSWORD} | sudo -S docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWD}"
                 sh "echo ${SLAVE_PASSWORD} | sudo -S docker push ${env.DOCKERHUB_IMAGE}:latest"
