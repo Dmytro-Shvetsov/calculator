@@ -8,10 +8,10 @@ node("ubuntu-slave-1")
 {
     stage("Cloning git")
     {
-        git credentialsId: '6a470481-5272-42b2-98ae-5ede2528bc13', url: 'https://github.com/Dmytro-Shvetsov/calculator'
+        git credentialsId: '27dba3c9-93b1-4619-8c7f-dc10969057ca', url: 'https://github.com/Dmytro-Shvetsov/calculator'
     }
     
-    withCredentials([usernamePassword(credentialsId: '05b94153-82a9-44bd-98d3-c35132260797', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
+    withCredentials([usernamePassword(credentialsId: 'f2901bd9-cb29-4417-9980-df75e729021d', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
     {
         stage("Cloning docker image")
         {
