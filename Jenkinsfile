@@ -19,7 +19,7 @@ node("ubuntu-slave-1")
         }
         stage("Unit-testing")
         {
-            sh "echo ${PASSWORD} | sudo -S docker run --rm -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
+            sh "echo ${PASSWORD} | sudo -S docker run -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
             try 
             {
                 //sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
@@ -32,6 +32,7 @@ node("ubuntu-slave-1")
         stage("Publish")
         {
             sh "echo ${PASSWORD} | sudo -S docker commit test ${env.DOCKERHUB_IMAGE}"
+            sh "echo ${PASSWORD} | sudo -S docker rm test"
             withDockerRegistry([credentialsId: "DockerHub"])
             {
                 sh "echo ${PASSWORD} | sudo -S docker push ${env.DOCKERHUB_IMAGE}:latest"
