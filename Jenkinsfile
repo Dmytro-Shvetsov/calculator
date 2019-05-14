@@ -16,7 +16,7 @@ node("ubuntu-slave-1")
             sh "echo ${SLAVE_PASSWORD} | sudo -S docker run -d --name test -p 3000:3000 calc-demo:${BUILD_NUMBER}"
             try 
             {
-                //sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
+                sh "echo ${PASSWORD} | sudo -S docker exec -it test npm test"
             }catch(error)
             {
                 sh "Unit tests have not passed. ${error}"
