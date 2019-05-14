@@ -1,9 +1,3 @@
-environment
-    {
-        DOCKERHUB_USERNAME = "dymokk"
-        DOCKERHUB_PROJECT_NAME = "calculator"
-        DOCKERHUB_IMAGE = DOCKERHUB_USERNAME + "/" + DOCKERHUB_PROJECT_NAME
-    }
 node("ubuntu-slave-1")
 {
     stage("Cloning git")
@@ -36,7 +30,7 @@ node("ubuntu-slave-1")
             withCredentials([usernamePassword(credentialsId: 'DockerHub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')])
             {
                 sh "echo ${SLAVE_PASSWORD} | sudo -S docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWD}"
-                sh "echo ${SLAVE_PASSWORD} | sudo -S docker push ${env.DOCKERHUB_IMAGE}:latest"
+                sh "echo ${SLAVE_PASSWORD} | sudo -S docker push "dymokk/calculator":latest"
             }
         }
     }
